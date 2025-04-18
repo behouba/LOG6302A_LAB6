@@ -1,0 +1,73 @@
+
+=== 1.1.a Clones paramétriques (identiques) ===
+Nombre de fichiers : 47
+Kits concernés      : ['2099', '4417']
+Exemples de fichiers :
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/cc/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/info/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/start/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/1f7ebc62d330d7e48473470961169eb4/cc/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/1f7ebc62d330d7e48473470961169eb4/info/index.php.ast.json.gz
+
+=== 1.1.b Clones paramétriques (inter-kit) ===
+Kits distincts : 7 → ['0415', '0485', '1110', '1442', '3135', '3662', '3716']
+Un exemple de fichier par kit :
+  [0415] ast/0415/M&T/darkx/anti2.php.ast.json.gz
+  [0485] ast/0485/we logz sure/anti/anti2.php.ast.json.gz
+  [1110] ast/1110/submit/prevents/anti2.php.ast.json.gz
+  [1442] ast/1442/web/auth/Bots/anti2.php.ast.json.gz
+  [3135] ast/3135/hunting/antibot/anti10.php.ast.json.gz
+  [3662] ast/3662/usps-shippment/bots/anti2.php.ast.json.gz
+  [3716] ast/3716/gruposantander/xJOESTAR/anti10.php.ast.json.gz
+
+=== 1.2 Fichiers similaires (Manhattan ≤ 30 %) ===
+Nombre de fichiers dans le plus grand groupe : 81
+Kits concernés                             : ['2099', '2110', '4417']
+Exemples de fichiers :
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/cc/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/info/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/start/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/vbv/index.php.ast.json.gz
+  - ast/2099/dhl/a1b2c3/1f7ebc62d330d7e48473470961169eb4/cc/index.php.ast.json.gz
+
+=== 2.1 Clones paramétriques (fragments) ===
+Nombre de kits distincts pour ce fragment : 12 → ['0009', '0229', '1110', '1651', '2070', '2099', '2110', '3180', '3548', '3676', '4218', '4417']
+Fonctions (image du nœud) correspondant à ce fragment :
+  - recurse_copy
+  - recurse_copy
+  - recurse_copy
+  - recurse_copy
+  - recurse_copy
+  - dublicate
+  - dublicate
+  - recurse_copy
+  - recurse_copy
+  - recurse_copy
+  - recurse_copy
+  - dublicate
+
+=== 2.2 Fragments similaires (Manhattan ≤ 10 %) ===
+Nombre de fragments (kits distincts) : 16 → ['0109', '0229', '0406', '0415', '0431', '0481', '1033', '1110', '1442', '1651', '1926', '2866', '3148', '3716', '3858', '4273']
+Fonctions correspondant à ces fragments :
+  - getOS
+  - get_user_os
+  - getOS
+  - getOs
+  - getOS
+  - XB_OS
+  - getOs
+  - get_user_os
+  - XB_OS
+  - get_user_os
+  - getOS
+  - XB_OS
+  - X_OS
+  - getOs
+  - getOs
+  - XB_OS
+
+=== 3 Kits paramétriques ===
+Plus gros groupe de kits : 3 → ['0398', '0556', '2784']
+
+Distribution des types de nœuds (par colonne) pour ces kits (identiques) :
+→ Tous ces kits ont exactement la même distribution de types (puisque leurs vecteurs sont identiques).

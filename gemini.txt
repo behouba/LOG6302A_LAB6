@@ -1,0 +1,63 @@
+Starting data loading and initial processing...
+Finished loading. Found 900 files >= 100 nodes.
+Found 2571 fragments >= 10 nodes.
+
+--- Section 1: Files ---
+
+--- 1.1 Parametric Clones (Files) ---
+Largest group size (including intra-kit duplicates): 47
+Examples from largest group (first 5):
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/cc/index.php.ast.json.gz
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/info/index.php.ast.json.gz
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/start/index.php.ast.json.gz
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/1f7ebc62d330d7e48473470961169eb4/cc/index.php.ast.json.gz
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/1f7ebc62d330d7e48473470961169eb4/info/index.php.ast.json.gz
+
+Largest group size (ignoring intra-kit duplicates): 7
+Examples from largest inter-kit group (first 5):
+  - Kit: 0415, Path: ast/0415/M&T/darkx/anti2.php.ast.json.gz
+  - Kit: 0485, Path: ast/0485/we logz sure/anti/anti2.php.ast.json.gz
+  - Kit: 1110, Path: ast/1110/submit/prevents/anti2.php.ast.json.gz
+  - Kit: 1442, Path: ast/1442/web/auth/Bots/anti2.php.ast.json.gz
+  - Kit: 3135, Path: ast/3135/hunting/antibot/anti10.php.ast.json.gz
+
+--- 1.2 Similar Files ---
+Calculating similarities for 900 items...
+Largest group size (similar files, Manhattan dist <= 30.0% of size): 229
+Examples from largest similar group (first 5):
+  - Kit: 0009, Path: ast/0009/CA 3.0/CA 3.0/index.php.ast.json.gz
+  - Kit: 0063, Path: ast/0063/Wells/Layout/Terraform/email.php.ast.json.gz
+  - Kit: 0063, Path: ast/0063/Wells/Layout/Terraform/index.php.ast.json.gz
+  - Kit: 0063, Path: ast/0063/Wells/Login/index.php.ast.json.gz
+  - Kit: 0109, Path: ast/0109/cappy/s/a/process/verify_session_account.php.ast.json.gz
+
+
+--- Section 2: Fragments ---
+
+--- 2.1 Parametric Clones (Fragments) ---
+Most duplicated fragment count (inter-kit): 12
+Corresponding function name(s): dublicate, recurse_copy
+Example instances (first 5):
+  - Kit: 0009, Path: ast/0009/CA 3.0/CA 3.0/index.php.ast.json.gz, RootID: 7785818, Func: recurse_copy
+  - Kit: 0229, Path: ast/0229/io/Login/index.php.ast.json.gz, RootID: 67852249, Func: recurse_copy
+  - Kit: 1110, Path: ast/1110/submit/index.php.ast.json.gz, RootID: 374162195, Func: recurse_copy
+  - Kit: 1651, Path: ast/1651/index.php.ast.json.gz, RootID: 578686425, Func: recurse_copy
+  - Kit: 2070, Path: ast/2070/AdobeDoc/index.php.ast.json.gz, RootID: 746846998, Func: recurse_copy
+
+--- 2.2 Similar Fragments ---
+Calculating similarities for 2571 items...
+Largest group size (similar fragments, inter-kit, Manhattan dist <= 10.0% of size): 82
+Corresponding function name(s) in largest group: include_config
+Example instances (first 5):
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/cc/index.php.ast.json.gz, RootID: 749094388, Func: include_config
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/info/index.php.ast.json.gz, RootID: 749094627, Func: include_config
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/start/index.php.ast.json.gz, RootID: 749094835, Func: include_config
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/082e3739ba7c5489ea1c9eee2d64ecf7/vbv/index.php.ast.json.gz, RootID: 749095043, Func: include_config
+  - Kit: 2099, Path: ast/2099/dhl/a1b2c3/1f7ebc62d330d7e48473470961169eb4/cc/index.php.ast.json.gz, RootID: 749095262, Func: include_config
+
+
+--- Section 3: Kits 'Paramétriques' ---
+
+Largest group of kits with identical summed fragment vectors: 3
+Kit IDs in this group: 0398, 0556, 2784
+Representative summed vector (first 30 elements): (np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(36), np.int64(36), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(24), np.int64(3), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(18), np.int64(0), np.int64(0), np.int64(0), np.int64(0), np.int64(0))...
