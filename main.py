@@ -4,13 +4,15 @@ import collections
 import sys
 import time
 from code_analysis import ASTReader, AST_fragmentation
+import matplotlib.pyplot as plt
+import networkx as nx
+from collections import Counter
 
 AST_PATH = "ast"  # Chemin vers les kits d'AST
 MIN_NODES_FILE = 100
 MIN_NODES_FRAGMENT = 10
 SIMILARITY_THRESHOLD_FILE = 0.30
 SIMILARITY_THRESHOLD_FRAGMENT = 0.10
-
 
 # Trouve tous les fichiers .ast.json dans les sous-dossiers de base_path.
 def get_ast_files(base_path):
@@ -58,15 +60,13 @@ def get_function_name(ast, fragment_node_id):
     return f"[{node_type}_SansNomTrouve_{fragment_node_id}]"
 
 
-# Chargement et Prétraitement des Données
 
 print("Chargement des données AST...")
-start_time = time.time()
 reader = ASTReader()
 kit_files_map, kits = get_ast_files(AST_PATH)
 
-all_files_data = [] # (filepath, kit_id, vector, node_count)
-all_fragments_data = [] # (filepath, kit_id, fragment_node_id, vector, node_count, function_name)
+all_files_data = [] 
+all_fragments_data = [] 
 
 asts_cache = {} # Cache pour éviter de relire les ASTs: {filepath: ast}
 def get_ast(path):
@@ -97,7 +97,7 @@ except Exception as e:
 
 
 for kit_id in kits:
-    print(f"  Traitement du kit : {kit_id} ({len(kit_files_map[kit_id])} fichiers)")
+    # print(f"  Traitement du kit : {kit_id} ({len(kit_files_map[kit_id])} fichiers)")
     for filepath in kit_files_map[kit_id]:
         try:
             ast = get_ast(filepath)
@@ -126,21 +126,14 @@ for kit_id in kits:
         except Exception as e:
             print(f"    Erreur lors du traitement de {filepath}: {e}")
 
-loading_time = time.time() - start_time
-print(f"Chargement terminé en {loading_time:.2f} secondes.")
 print(f"Nombre total de fichiers AST traités : {total_files_processed}")
 print(f"Nombre total de fragments extraits : {total_fragments_processed}")
-print("-" * 30)
 
-print("\nQuestion 1: Analyse au niveau des fichiers")
-
-print("\n1.1 Clones 'paramétriques' (Fichiers exacts, >100 nœuds)")
-start_time = time.time()
 
 files_filtered = [(fp, k_id, vec, count) for fp, k_id, vec, count in all_files_data if count >= MIN_NODES_FILE]
 print(f"Nombre de fichiers avec >= {MIN_NODES_FILE} nœuds : {len(files_filtered)}")
 
-# Groupement par vecteur (ignorant les doublons intra-kit pour l'instant)
+# Groupement par vecteur (ignorant les doublons intra-kit)
 vectors_files_exact = collections.defaultdict(list)
 for filepath, kit_id, vector, _ in files_filtered:
     vector_tuple = tuple(vector)
@@ -151,31 +144,16 @@ if vectors_files_exact:
     largest_group_files_exact = max(vectors_files_exact.values(), key=len)
 
 print(f"Taille du plus grand groupe de fichiers identiques : {len(largest_group_files_exact)}")
-print(f"Kits concernés : {', '.join(set(k_id for fp, k_id in largest_group_files_exact))}")
 if largest_group_files_exact:
     print("Exemples de fichiers dans ce groupe :")
-    for i, (fp, k_id) in enumerate(largest_group_files_exact[:5]):
+    for i, (fp, k_id) in enumerate(largest_group_files_exact[:10]):
         print(f"  - {fp} (Kit: {k_id})")
     if len(largest_group_files_exact) > 5:
         print("  ...")
 
-    # Question : Que remarquez-vous concernant ces fichiers ?
-    print("\nRemarques sur ces fichiers identiques :")
     kits_in_group = set(k_id for _, k_id in largest_group_files_exact)
-    print("Kits concernés :", ", ".join(sorted(kits_in_group)))
-    if len(kits_in_group) == 1:
-        print(f"- Tous les fichiers de ce groupe appartiennent au même kit: {list(kits_in_group)[0]}.")
-        print("- Il s'agit probablement de copies exactes du même fichier au sein de ce kit.")
-    elif len(kits_in_group) < len(largest_group_files_exact):
-         print(f"- Le groupe contient des fichiers provenant de {len(kits_in_group)} kits différents.")
-         print("- Certains kits contiennent plusieurs copies de ce fichier.")
-         print("- D'autres kits pourraient être des copies ou des évolutions très proches les uns des autres.")
-    else:
-         print(f"- Le groupe contient des fichiers provenant de {len(kits_in_group)} kits différents (un fichier par kit).")
-         print("- Cela suggère une réutilisation directe d'un fichier spécifique à travers plusieurs kits distincts.")
+    print(f"Ils proviennent exclusivement de {len(kits_in_group)} kits:", ", ".join(sorted(kits_in_group)))
 
-# Refaire l'opération en ignorant les vecteurs dupliqués au sein d'un même kit
-print("\nAnalyse des clones paramétriques (fichiers) en ignorant les duplicats intra-kit:")
 vectors_files_exact_unique_kit = collections.defaultdict(set)
 for filepath, kit_id, vector, _ in files_filtered:
     vector_tuple = tuple(vector)
@@ -195,13 +173,6 @@ if largest_group_size_unique_kit > 0:
 
 print(f"Kits concernés : {', '.join(sorted(list(kits_in_largest_groups)))}")
 
-if largest_group_size_unique_kit > 0:
-     print("Cela indique le nombre maximum de kits *différents* qui contiennent au moins une copie d'un fichier spécifique (ayant >100 nœuds).")
-
-# print(f"Analyse 1.1 terminée en {time.time() - start_time:.2f} secondes.")
-
-print("\n1.2 Fichiers similaires (>100 nœuds, distance <= 30%)")
-start_time = time.time()
 
 n_files = len(files_filtered)
 similarity_groups = collections.defaultdict(list)
@@ -244,17 +215,7 @@ if largest_group_files_similar_indices:
     kits_in_similar_group = set(files_filtered[idx][1] for idx in largest_group_files_similar_indices)
     print(f"\nCe groupe de fichiers similaires provient de {len(kits_in_similar_group)} kits différents.")
     print(f"Kits concernés : {', '.join(sorted(list(kits_in_similar_group)))}")
-    print("Cela suggère une base de code commune ou des modifications mineures (paramétrisation, renommage)")
-    print("entre des fichiers servant potentiellement le même objectif dans différents kits.")
 
-print(f"Analyse 1.2 terminée en {time.time() - start_time:.2f} secondes.")
-print("-" * 30)
-
-
-print("\nQuestion 2: Analyse au niveau des fragments")
-
-print("\n2.1 Clones 'paramétriques' (Fragments exacts, >10 nœuds, hors duplicats intra-kit)")
-start_time = time.time()
 
 fragments_filtered = [(fp, k_id, f_id, vec, count, name) for fp, k_id, f_id, vec, count, name in all_fragments_data if count >= MIN_NODES_FRAGMENT]
 print(f"Nombre de fragments avec >= {MIN_NODES_FRAGMENT} nœuds : {len(fragments_filtered)}")
@@ -296,16 +257,8 @@ if most_duplicated_fragment_info:
         print("Aucun nom de fonction/méthode n'a pu être extrait pour ce fragment.")
     example_fp, example_fid = most_duplicated_fragment_info['examples'][0]
     print(f"Exemple d'occurrence : Fichier '{example_fp}', Nœud fragment ID: {example_fid}")
-    print("Ce fragment représente probablement une fonction utilitaire commune ou une partie standard")
-    print("d'un framework réutilisé dans de nombreux kits de phishing.")
-
-print(f"Analyse 2.1 terminée en {time.time() - start_time:.2f} secondes.")
 
 
-print("\n2.2 Fragments similaires (>10 nœuds, distance <= 10%, hors duplicats intra-kit)")
-start_time = time.time()
-
-# Créer une liste de fragments où chaque (vecteur, kit_id) est unique.
 unique_fragments_per_kit = {}
 for filepath, kit_id, frag_id, vector, count, name in fragments_filtered:
     vector_tuple = tuple(vector)
@@ -317,7 +270,6 @@ fragments_to_compare = list(unique_fragments_per_kit.values())
 n_fragments = len(fragments_to_compare)
 print(f"Nombre de fragments uniques par kit (avec >= {MIN_NODES_FRAGMENT} nœuds) à comparer : {n_fragments}")
 
-# Calculer les similarités par paires sur cette liste unique
 similarity_groups_frags = collections.defaultdict(list)
 
 if n_fragments > 1:
@@ -330,9 +282,8 @@ if n_fragments > 1:
         for j in range(i + 1, n_fragments):
             vector_j, kit_id_j, name_j, fp_j, node_count_j = fragments_to_compare[j]
 
-            # Assurer que les kits sont différents pour la similarité inter-kit
             if kit_id_i == kit_id_j:
-                 continue # On ignore la similarité intra-kit ici comme demandé implicitement
+                 continue # On ignore la similarité intra-kit ici
 
             distance = calculate_manhattan_distance(vector_i, vector_j)
             threshold_j = SIMILARITY_THRESHOLD_FRAGMENT * node_count_j
@@ -341,7 +292,7 @@ if n_fragments > 1:
                  similarity_groups_frags[i].append(j)
                  similarity_groups_frags[j].append(i)
 else:
-     print("Pas assez de fragments uniques par kit (>1) pour comparer la similarité.")
+     print("Pas assez de fragments uniques par kit (>1).")
 
 
 largest_group_frags_similar_indices = []
@@ -352,7 +303,6 @@ if similarity_groups_frags:
 print(f"\nTaille du plus grand groupe de fragments similaires trouvé (inter-kit) : {len(largest_group_frags_similar_indices)}")
 
 if largest_group_frags_similar_indices:
-    # Question: Quelle est le nom(s) de la fonction correspondant à ces fragments?
     names_in_similar_group = set()
     representative_frags = []
     for idx in largest_group_frags_similar_indices:
@@ -371,22 +321,12 @@ if largest_group_frags_similar_indices:
         print(f"\nNom(s) de fonction/méthode associés à ces fragments similaires : {', '.join(sorted(list(names_in_similar_group)))}")
     else:
         print("\nAucun nom de fonction/méthode n'a pu être extrait pour les fragments de ce groupe.")
-    print("Ces fragments représentent probablement des variations mineures de fonctions communes,")
-    print("peut-être dues à l'obfuscation, au renommage de variables ou à de petites modifications fonctionnelles.")
 
-print(f"Analyse 2.2 terminée en {time.time() - start_time:.2f} secondes.")
-print("-" * 30)
-
-print("\nSection 3: Analyse au niveau des kits 'paramétriques'")
-start_time = time.time()
 
 kit_vectors_sum = collections.defaultdict(lambda: np.zeros(VECTOR_SIZE, dtype=int))
 kit_fragment_count = collections.defaultdict(int)
 
 print("Calcul des vecteurs représentatifs des kits (somme des fragments)...")
-# Utiliser tous les fragments (pas seulement > 10 noeuds) pour le vecteur kit ?
-# L'énoncé dit "sommant (par colonne) tout les fragments qui composent ce kit."
-# Utilisons all_fragments_data
 for filepath, kit_id, frag_id, vector, count, name in all_fragments_data:
      kit_vectors_sum[kit_id] += vector
      kit_fragment_count[kit_id] += 1
@@ -410,19 +350,7 @@ if largest_group_kits_exact:
     print(f"Kits dans ce groupe : {', '.join(sorted(largest_group_kits_exact))}")
 
     # Question: Y a-t-il des différences entre ces kits au niveaux des types des nœuds de l'AST (type, image)?
-    print("\nDifférences au niveau des types de nœuds AST pour ces kits identiques (basé sur le vecteur somme) :")
-    # Par définition, si les vecteurs sommes sont identiques, la *distribution globale* des types de nœuds
-    # (telle que capturée par la somme des vecteurs fragments) est identique entre ces kits.
-    print("- Non, par définition de ce groupe, leurs vecteurs représentatifs (somme des vecteurs fragments) sont identiques.")
-    print("- Cela signifie que la somme totale des occurrences de chaque type de nœud AST, sur l'ensemble des fragments de chaque kit, est la même.")
-    print("- Cette mesure ne capture cependant pas la structure fine, l'organisation des fragments, ou le contenu textuel ('image') des nœuds.")
-    print("- Il est possible que les kits soient structurellement différents mais aboutissent à la même somme vectorielle (moins probable si les kits sont complexes),")
-    print("  ou plus probablement, qu'ils soient des copies très proches ou exactes au niveau du code source analysé.")
 
-    # On pourrait vérifier si le nombre de fragments est aussi identique (indice supplémentaire)
+    # On vérifie si le nombre de fragments est aussi identique (indice supplémentaire)
     num_fragments_in_group = [kit_fragment_count[k] for k in largest_group_kits_exact]
-    if len(set(num_fragments_in_group)) == 1:
-        print(f"- De plus, tous les kits de ce groupe ont le même nombre de fragments détectés : {num_fragments_in_group[0]}.")
-    else:
-        print(f"- Fait intéressant : bien que les vecteurs sommes soient égaux, le nombre de fragments détectés varie dans ce groupe: {num_fragments_in_group}.")
-        print("  Cela pourrait indiquer des différences structurelles (ex: fonctions vides vs non vides, seuils de détection).")
+    print(f"Nombre de fragments détectés : {num_fragments_in_group[0]}.")
