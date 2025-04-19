@@ -130,8 +130,8 @@ print(f"Nombre total de fichiers AST traités : {total_files_processed}")
 print(f"Nombre total de fragments extraits : {total_fragments_processed}")
 
 
-files_filtered = [(fp, k_id, vec, count) for fp, k_id, vec, count in all_files_data if count >= MIN_NODES_FILE]
-print(f"Nombre de fichiers avec >= {MIN_NODES_FILE} nœuds : {len(files_filtered)}")
+files_filtered = [(fp, k_id, vec, count) for fp, k_id, vec, count in all_files_data if count > MIN_NODES_FILE]
+print(f"Nombre de fichiers avec > {MIN_NODES_FILE} nœuds : {len(files_filtered)}")
 
 # Groupement par vecteur (ignorant les doublons intra-kit)
 vectors_files_exact = collections.defaultdict(list)
@@ -217,8 +217,8 @@ if largest_group_files_similar_indices:
     print(f"Kits concernés : {', '.join(sorted(list(kits_in_similar_group)))}")
 
 
-fragments_filtered = [(fp, k_id, f_id, vec, count, name) for fp, k_id, f_id, vec, count, name in all_fragments_data if count >= MIN_NODES_FRAGMENT]
-print(f"Nombre de fragments avec >= {MIN_NODES_FRAGMENT} nœuds : {len(fragments_filtered)}")
+fragments_filtered = [(fp, k_id, f_id, vec, count, name) for fp, k_id, f_id, vec, count, name in all_fragments_data if count > MIN_NODES_FRAGMENT]
+print(f"Nombre de fragments avec > {MIN_NODES_FRAGMENT} nœuds : {len(fragments_filtered)}")
 
 # Groupement par vecteur, en ne comptant chaque kit qu'une fois par vecteur
 vectors_fragments_exact_unique_kit = collections.defaultdict(lambda: {'kits': set(), 'names': set(), 'examples': []})
@@ -268,7 +268,7 @@ for filepath, kit_id, frag_id, vector, count, name in fragments_filtered:
 
 fragments_to_compare = list(unique_fragments_per_kit.values())
 n_fragments = len(fragments_to_compare)
-print(f"Nombre de fragments uniques par kit (avec >= {MIN_NODES_FRAGMENT} nœuds) à comparer : {n_fragments}")
+print(f"Nombre de fragments uniques par kit (avec > {MIN_NODES_FRAGMENT} nœuds) à comparer : {n_fragments}")
 
 similarity_groups_frags = collections.defaultdict(list)
 
